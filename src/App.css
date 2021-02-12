@@ -15,9 +15,9 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  height: 100px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+
+.currency {
+  display: flex;
+  padding: 5px;
+}
+.currency--name {
+  width: 50px;
+}
+
+.exchange-setup {
+  display: flex;
+}
+
