@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import "antd/dist/antd.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
+import { Table } from "antd";
 
 export default function CurrencyRates(props) {
   const [avCurr, setAvCurr] = useState(["USD"]);
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("USD");
-  const [ammount, setAmmount] = useState(1);
+  const [amount, setAmount] = useState(100);
   const [rate, setRate] = useState(1);
   const [rates, setRates] = useState(1);
 
@@ -22,7 +22,7 @@ export default function CurrencyRates(props) {
     });
   }, []);
 
-  function getExchangeRates() {
+  useEffect(() => {
     setStatus("pending");
     axios
       .get(`https://api.exchangeratesapi.io/latest?base=${fromCurrency}`)
@@ -33,9 +33,7 @@ export default function CurrencyRates(props) {
         setRates(data?.rates ?? 1);
         setStatus("done");
       });
-  }
-  // https://api.exchangeratesapi.io/latest?base=USD&symbols=GBP
-  // {"rates":{"USD":1.2147,"GBP":0.87755},"base":"EUR","date":"2021-02-11"}
+  }, [fromCurrency, toCurrency]);
 
   const handleFromChange = curr => {
     setFromCurrency(curr);
@@ -45,34 +43,48 @@ export default function CurrencyRates(props) {
     setToCurrency(curr);
   };
 
-  const handleAmmountChange = event => {
-    setAmmount(event.target.value);
-    console.log(event.target.value);
+  const handleAmountChange = event => {
+    setAmount(event.target.value);
   };
 
-  useEffect(() => {
-    getExchangeRates();
-  }, [fromCurrency, toCurrency]);
+  const getRatesToDisplay = () => {
+    if (status === "pending") {
+      return <LoadingOutlined />;
+    } else {
+      let data = Object.keys(rates).map((rate, index) => {
+        return {
+          Currency: rate, 
+          Rate: Math.round(rates[rate] * 100) / 100, 
+          Amount: Math.round(amount * rates[rate] * 100) / 100,
+          key: index
+        }
+      }).sort((a, b) => {return a['Currency'] < b['Currency'] ? -1 : 1});
+      let columns = [
+        {title:'Currency', dataIndex:'Currency'}, 
+        {title:'Rate', dataIndex:'Rate'},
+        {title:'Amount', dataIndex:'Amount'}
+      ];
+      return (
+        <>
+          <div>RESULT {Math.round(rate * amount * 100) / 100}</div>
+          <div>Other Currencies:</div>
+          <Table dataSource={data} columns={columns}  pagination={false}/>
+        </>
+      );
+    }
+  }
 
   return (
     <>
       <h3>CURRENCY EXCHANGE</h3>
       <div className="exchange-setup">
-        <input onChange={handleAmmountChange} value={ammount} />
+        <input onChange={handleAmountChange} value={amount} />
         <CurrencyPicker options={avCurr} callback={handleFromChange} />
         <CurrencyPicker options={avCurr} callback={handleToChange} />
       </div>
       <div>AS OF {exchangeDate}</div>
 
-      <div>RESULT {Math.round(rate * ammount * 100) / 100}</div>
-      <div>Other Currencies:</div>
-      {Object.keys(rates).map((rate, index) => {
-        return (
-          <div key={index}>
-            {rate} {Math.round(ammount * rates[rate] * 100) / 100}
-          </div>
-        );
-      })}
+      {getRatesToDisplay()}
     </>
   );
 }

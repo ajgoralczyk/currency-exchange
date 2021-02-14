@@ -4,6 +4,7 @@ import "antd/dist/antd.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
+import { Table } from "antd";
 
 export default function CurrencyRates(props) {
   const [avCurr, setAvCurr] = useState(["USD"]);
@@ -22,20 +23,6 @@ export default function CurrencyRates(props) {
     });
   }, []);
 
-  function getExchangeRates() {
-    setStatus("pending");
-    axios
-      .get(
-        `https://api.exchangeratesapi.io/history?start_at=2018-01-01&end_at=${latest}&base=${fromCurrency}&symbols=${toCurrency}`
-      )
-      .then(res => {
-        let data = res?.data;
-        setExchangeDate(data?.date ?? "--");
-        setHistory(data?.rates ?? 1);
-        setStatus("done");
-      });
-  }
-
   const handleFromChange = curr => {
     setFromCurrency(curr);
   };
@@ -45,8 +32,39 @@ export default function CurrencyRates(props) {
   };
 
   useEffect(() => {
-    getExchangeRates();
+    setStatus("pending");
+    axios
+      .get(
+        `https://api.exchangeratesapi.io/history?start_at=2019-01-01&end_at=${latest}&base=${fromCurrency}&symbols=${toCurrency}`
+      )
+      .then(res => {
+        let data = res?.data;
+        setExchangeDate(data?.date ?? "--");
+        setHistory(data?.rates ?? 1);
+        setStatus("done");
+      });
   }, [fromCurrency, toCurrency]);
+
+  const getRatesToDisplay = () => {
+    if (status === "pending") {
+      return <LoadingOutlined />;
+    } else {
+      let data = Object.keys(history).map((date, index) => {
+        return {
+          Date: date,
+          Rate: Math.round(history[date][toCurrency] * 100) / 100, 
+          key: index
+        }
+      }).sort((a, b) => {return a['Date'] > b['Date'] ? -1 : 1});
+      let columns = [
+        {title:'Date', dataIndex:'Date'}, 
+        {title:'Rate', dataIndex:'Rate'}
+      ];
+      return (
+        <Table dataSource={data} columns={columns}  pagination={false}/>
+      );
+    }
+  }
 
   return (
     <>
@@ -56,15 +74,7 @@ export default function CurrencyRates(props) {
         <CurrencyPicker options={avCurr} callback={handleToChange} />
       </div>
       <div>AS OF {exchangeDate}</div>
-      <div>
-        {Object.keys(history).map((date, index) => {
-          return (
-            <div key={index}>
-              {date} - {history[date][toCurrency]}
-            </div>
-          );
-        })}
-      </div>
+      {getRatesToDisplay()}
     </>
   );
 }
