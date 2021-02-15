@@ -4,9 +4,9 @@ import "./App.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Table, Typography } from "antd";
+import { Table, Typography, Row, Col, Space, Statistic } from "antd";
 
-export default function CurrencyRates(props) {
+export default function CurrencyRates() {
   const today = new Date().toISOString().substr(0,10);
   const [avCurr, setAvCurr] = useState(["USD"]);
   const [fromCurrency, setFromCurrency] = useState("USD");
@@ -76,21 +76,24 @@ export default function CurrencyRates(props) {
 
   return (
     <>
-      <div className="overview">
-        <div className="overview__block">
-          <CurrencyPicker options={avCurr} callback={handleFromChange} />
-          <CurrencyPicker options={avCurr} callback={handleToChange} />
-        </div>
-        <div className="overview__block">
-          <div className="exchange-information">
-            <Typography.Text type="secondary">Current exchange rate</Typography.Text>
-            <Typography.Title level={2}>{rate.toFixed(4)}</Typography.Title>
-          </div>
-        </div>
-        <div className="overview__block">
+      <Row>
+        <Col span={24}>
+          <Space size={20}>
+            <CurrencyPicker options={avCurr} callback={handleFromChange} />
+            <CurrencyPicker options={avCurr} callback={handleToChange} />
+          </Space>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={12}>
+          <Statistic title="Current exchange rate" value={rate.toFixed(4)} />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
           <Typography.Text strong className="overview__date">As of: {exchangeDate}</Typography.Text>
-        </div>
-      </div>
+        </Col>
+      </Row>
       {getRatesToDisplay()}
     </>
   );

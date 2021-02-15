@@ -4,9 +4,9 @@ import "./App.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Table, Typography, InputNumber } from "antd";
+import { Table, Typography, InputNumber, Row, Col, Space, Statistic } from "antd";
 
-export default function CurrencyRates(props) {
+export default function CurrencyRates() {
   const [avCurr, setAvCurr] = useState(["USD"]);
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("USD");
@@ -75,28 +75,29 @@ export default function CurrencyRates(props) {
   }
 
   return (
-    <>
-      <div className="overview">
-        <div className="overview__block">
-          {/* <input onChange={handleAmountChange} value={amount} /> */}
-          <InputNumber min={1} defaultValue={amount} onChange={handleAmountChange} />
-          <CurrencyPicker options={avCurr} callback={handleFromChange} />
-          <CurrencyPicker options={avCurr} callback={handleToChange} />
-        </div>
-        <div className="overview__block">
-          <div className="exchange-information">
-            <Typography.Text type="secondary">Total amount in {toCurrency}</Typography.Text>
-            <Typography.Title level={2}>{(rate * amount).toFixed(2)}</Typography.Title>
-          </div>
-          <div className="exchange-information">
-            <Typography.Text type="secondary">Exchange rate</Typography.Text>
-            <Typography.Title level={2}>{rate.toFixed(4)}</Typography.Title>
-          </div>
-        </div>
-        <div className="overview__block">
+    <> 
+      <Row>
+        <Col span={24}>
+          <Space size={20}>
+            <InputNumber min={1} defaultValue={amount} onChange={handleAmountChange} />
+            <CurrencyPicker options={avCurr} callback={handleFromChange} />
+            <CurrencyPicker options={avCurr} callback={handleToChange} />
+          </Space>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={12}>
+          <Statistic title={`Total amount in ${toCurrency}`} value={(rate * amount).toFixed(2)} />
+        </Col>
+        <Col span={12}>
+        <Statistic title="Exchange rate" value={rate.toFixed(4)} />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
           <Typography.Text strong className="overview__date">As of: {exchangeDate}</Typography.Text>
-        </div>
-      </div>
+        </Col>
+      </Row>
       {getRatesToDisplay()}
     </>
   );

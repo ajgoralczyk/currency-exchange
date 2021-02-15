@@ -4,10 +4,10 @@ import "./App.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Table, Typography } from "antd";
+import { Table, Typography, Row, Col } from "antd";
 
 
-export default function CurrencyRates(props) {
+export default function CurrencyRates() {
   const [avCurr, setAvCurr] = useState(["USD"]);
   const [currency, setCurrency] = useState("USD");
   const [status, setStatus] = useState("pending");
@@ -36,7 +36,11 @@ export default function CurrencyRates(props) {
       return <LoadingOutlined />;
     } else {
       let data = Object.keys(rates).map((rate, index) => {
-        return {Currency: rate, Rate: rates[rate].toFixed(4), key: index}
+        return {
+          Currency: rate, 
+          Rate: rates[rate].toFixed(4), 
+          key: index
+        }
       }).sort((a, b) => {return a['Currency'] < b['Currency'] ? -1 : 1});
       let columns = [
         {title:'Currency', dataIndex:'Currency'}, 
@@ -52,14 +56,16 @@ export default function CurrencyRates(props) {
 
   return (
     <>
-      <div className="overview">
-        <div className="overview__block">
+      <Row>
+        <Col span={24}>
           <CurrencyPicker options={avCurr} callback={handleCurrChange} />
-        </div>
-        <div className="overview__block">
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
           <Typography.Text strong className="overview__date">As of: {exchangeDate}</Typography.Text>
-        </div>
-      </div>
+        </Col>
+      </Row>
       <div>{getRatesToDisplay()}</div>
     </>
   );

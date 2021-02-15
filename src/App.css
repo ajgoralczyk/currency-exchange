@@ -1,11 +1,16 @@
 
 /* STYLE ADJUSTMENTS */
+
 h1,h2,h3,h4,h5 {
   margin: 0px !important;
 }
 
 .ant-table-wrapper {
   max-width: 800px;
+}
+
+.ant-row {
+  margin-bottom: 30px;
 }
 
 /* NEW STYLES */
@@ -25,21 +30,3 @@ h1,h2,h3,h4,h5 {
 .currency-picker {
   width: 150px;
 }
-
-.overview__block {
-  display: flex;
-  margin: 40px 0;
-}
-
-.overview__block > * {
-  margin-right: 30px;
-}
-
-.currency {
-  display: flex;
-  padding: 5px;
-}
-.currency__name {
-  width: 50px;
-}
-
