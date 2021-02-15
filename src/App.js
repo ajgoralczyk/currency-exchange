@@ -12,7 +12,7 @@ import {
   Link
 } from "react-router-dom";
 
-const { Header } = Layout;
+const { Header, Content } = Layout;
 
 function App() {
 

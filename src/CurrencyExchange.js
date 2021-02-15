@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "antd/dist/antd.css";
+import "./App.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+import { Table, Typography, InputNumber } from "antd";
 
 export default function CurrencyRates(props) {
   const [avCurr, setAvCurr] = useState(["USD"]);
@@ -43,8 +44,8 @@ export default function CurrencyRates(props) {
     setToCurrency(curr);
   };
 
-  const handleAmountChange = event => {
-    setAmount(event.target.value);
+  const handleAmountChange = value => {
+    setAmount(value);
   };
 
   const getRatesToDisplay = () => {
@@ -54,8 +55,8 @@ export default function CurrencyRates(props) {
       let data = Object.keys(rates).map((rate, index) => {
         return {
           Currency: rate, 
-          Rate: Math.round(rates[rate] * 100) / 100, 
-          Amount: Math.round(amount * rates[rate] * 100) / 100,
+          Rate: rates[rate].toFixed(4), 
+          Amount: (amount * rates[rate]).toFixed(2),
           key: index
         }
       }).sort((a, b) => {return a['Currency'] < b['Currency'] ? -1 : 1});
@@ -66,9 +67,8 @@ export default function CurrencyRates(props) {
       ];
       return (
         <>
-          <div>RESULT {Math.round(rate * amount * 100) / 100}</div>
-          <div>Other Currencies:</div>
-          <Table dataSource={data} columns={columns}  pagination={false}/>
+          <Typography.Text>Other Currencies</Typography.Text>
+          <Table dataSource={data} columns={columns} bordered={true} pagination={false}/>
         </>
       );
     }
@@ -76,14 +76,27 @@ export default function CurrencyRates(props) {
 
   return (
     <>
-      <h3>CURRENCY EXCHANGE</h3>
-      <div className="exchange-setup">
-        <input onChange={handleAmountChange} value={amount} />
-        <CurrencyPicker options={avCurr} callback={handleFromChange} />
-        <CurrencyPicker options={avCurr} callback={handleToChange} />
+      <div className="overview">
+        <div className="overview__block">
+          {/* <input onChange={handleAmountChange} value={amount} /> */}
+          <InputNumber min={1} defaultValue={amount} onChange={handleAmountChange} />
+          <CurrencyPicker options={avCurr} callback={handleFromChange} />
+          <CurrencyPicker options={avCurr} callback={handleToChange} />
+        </div>
+        <div className="overview__block">
+          <div className="exchange-information">
+            <Typography.Text type="secondary">Total amount in {toCurrency}</Typography.Text>
+            <Typography.Title level={2}>{(rate * amount).toFixed(2)}</Typography.Title>
+          </div>
+          <div className="exchange-information">
+            <Typography.Text type="secondary">Exchange rate</Typography.Text>
+            <Typography.Title level={2}>{rate.toFixed(4)}</Typography.Title>
+          </div>
+        </div>
+        <div className="overview__block">
+          <Typography.Text strong className="overview__date">As of: {exchangeDate}</Typography.Text>
+        </div>
       </div>
-      <div>AS OF {exchangeDate}</div>
-
       {getRatesToDisplay()}
     </>
   );

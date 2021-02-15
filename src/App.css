@@ -1,6 +1,14 @@
-/* body {
-  background-color: #F0F2F5;
-} */
+
+/* STYLE ADJUSTMENTS */
+h1,h2,h3,h4,h5 {
+  margin: 0px !important;
+}
+
+.ant-table-wrapper {
+  max-width: 800px;
+}
+
+/* NEW STYLES */
 
 .logo {
   float: left;
@@ -11,17 +19,27 @@
 
 .page-wrapper {
   padding: 50px;
+  background-color: white;
+}
+
+.currency-picker {
+  width: 150px;
+}
+
+.overview__block {
+  display: flex;
+  margin: 40px 0;
+}
+
+.overview__block > * {
+  margin-right: 30px;
 }
 
 .currency {
   display: flex;
   padding: 5px;
 }
-.currency--name {
+.currency__name {
   width: 50px;
-}
-
-.exchange-setup {
-  display: flex;
 }
 

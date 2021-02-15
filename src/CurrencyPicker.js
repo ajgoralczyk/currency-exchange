@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
 import "antd/dist/antd.css";
+import "./App.css";
 import { Select } from "antd";
 
 const { Option } = Select;
@@ -15,7 +15,7 @@ export default function CurrencyPicker(props) {
   return (
     <Select
       defaultValue={availableCurrencies[0]}
-      style={{ width: 120 }}
+      className="currency-picker"
       onChange={handleChange}
     >
       {availableCurrencies.map((curr, index) => {

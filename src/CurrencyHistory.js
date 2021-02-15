@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import "antd/dist/antd.css";
+import "./App.css";
 import axios from "axios";
 import CurrencyPicker from "./CurrencyPicker.js";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Table } from "antd";
+import { Table, Typography } from "antd";
 
 export default function CurrencyRates(props) {
+  const today = new Date().toISOString().substr(0,10);
   const [avCurr, setAvCurr] = useState(["USD"]);
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("USD");
-  const [history, setHistory] = useState(1);
-  const [latest, setLatest] = useState("2021-01-01");
+  const [history, setHistory] = useState();
+  const [rate, setRate] = useState(1);
 
   const [status, setStatus] = useState("pending");
   const [exchangeDate, setExchangeDate] = useState("--");
@@ -19,9 +20,10 @@ export default function CurrencyRates(props) {
   useEffect(() => {
     axios.get(`https://api.exchangeratesapi.io/latest`).then(res => {
       setAvCurr(Object.keys(res?.data?.rates ?? {}));
-      setLatest(res?.data?.date ?? "2021-01-01");
     });
   }, []);
+
+  new Date().toString();
 
   const handleFromChange = curr => {
     setFromCurrency(curr);
@@ -35,15 +37,18 @@ export default function CurrencyRates(props) {
     setStatus("pending");
     axios
       .get(
-        `https://api.exchangeratesapi.io/history?start_at=2019-01-01&end_at=${latest}&base=${fromCurrency}&symbols=${toCurrency}`
+        `https://api.exchangeratesapi.io/history?start_at=2019-01-01&end_at=${today}&base=${fromCurrency}&symbols=${toCurrency}`
       )
       .then(res => {
         let data = res?.data;
-        setExchangeDate(data?.date ?? "--");
+
+        let newestDate = Object.keys(data?.rates).reduce((max, val) => max > val ? max : val)
+        setExchangeDate(newestDate ?? "--");
+        setRate(data?.rates[newestDate][toCurrency] ?? 1);
         setHistory(data?.rates ?? 1);
         setStatus("done");
       });
-  }, [fromCurrency, toCurrency]);
+  }, [fromCurrency, toCurrency, today]);
 
   const getRatesToDisplay = () => {
     if (status === "pending") {
@@ -61,19 +66,31 @@ export default function CurrencyRates(props) {
         {title:'Rate', dataIndex:'Rate'}
       ];
       return (
-        <Table dataSource={data} columns={columns}  pagination={false}/>
+        <>
+          <Typography.Text>Past</Typography.Text>
+          <Table dataSource={data} columns={columns} bordered={true} pagination={false}/>
+        </>
       );
     }
   }
 
   return (
     <>
-      <h3>CURRENCY HISTORY</h3>
-      <div className="exchange-setup">
-        <CurrencyPicker options={avCurr} callback={handleFromChange} />
-        <CurrencyPicker options={avCurr} callback={handleToChange} />
+      <div className="overview">
+        <div className="overview__block">
+          <CurrencyPicker options={avCurr} callback={handleFromChange} />
+          <CurrencyPicker options={avCurr} callback={handleToChange} />
+        </div>
+        <div className="overview__block">
+          <div className="exchange-information">
+            <Typography.Text type="secondary">Current exchange rate</Typography.Text>
+            <Typography.Title level={2}>{rate.toFixed(4)}</Typography.Title>
+          </div>
+        </div>
+        <div className="overview__block">
+          <Typography.Text strong className="overview__date">As of: {exchangeDate}</Typography.Text>
+        </div>
       </div>
-      <div>AS OF {exchangeDate}</div>
       {getRatesToDisplay()}
     </>
   );
